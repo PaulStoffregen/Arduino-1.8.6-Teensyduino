@@ -387,12 +387,24 @@ public class SerialPlotter extends AbstractMonitor {
 
     if (serial != null) return;
 
-    serial = new Serial(getBoardPort().getAddress(), serialRate) {
-      @Override
-      protected void message(char buff[], int n) {
-        addToUpdateBuffer(buff, n);
+    int attempt = 1;
+    while (true) {
+      try {
+        serial = new Serial(getBoardPort().getAddress(), serialRate) {
+          @Override
+          protected void message(char buff[], int n) {
+            addToUpdateBuffer(buff, n);
+          }
+        };
+        break;
+      } catch (SerialException e) {
+        if (++attempt > 20) throw e; // try up to 2 seconds to open port
       }
-    };
+      try {
+        Thread.sleep(100);
+      } catch (Exception e) {
+      }
+    }
   }
 
   public void close() throws Exception {
@@ -412,7 +424,7 @@ public class SerialPlotter extends AbstractMonitor {
         errors = null;
       }
       if (shutdown != null) {
-        Runtime.getRuntime().addShutdownHook(shutdown);
+        Runtime.getRuntime().removeShutdownHook(shutdown);
         shutdown = null;
       }
       openport = null;
