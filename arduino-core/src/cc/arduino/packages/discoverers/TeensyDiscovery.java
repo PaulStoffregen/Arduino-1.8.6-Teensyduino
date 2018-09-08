@@ -48,7 +48,7 @@ public class TeensyDiscovery implements Discovery {
 			// https://sohlich.github.io/post/jackson/
 			// https://www.baeldung.com/jackson-object-mapper-tutorial
 			JsonFactory factory = new JsonFactory();
-			parser = factory.createJsonParser(input);
+			parser = factory.createParser(input);
 			mapper = new ObjectMapper();
 			mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 			while (true) {
